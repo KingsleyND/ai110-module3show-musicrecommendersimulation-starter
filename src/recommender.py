@@ -67,29 +67,31 @@ def score_song(user_prefs: Dict, song: Dict) -> Tuple[float, List[str]]:
     Scores a single song against user preferences.
     Returns (score, reasons) where reasons is a list of human-readable strings.
 
-    Scoring recipe:
-      +2.0  genre match      (binary)
+    EXPERIMENTAL scoring recipe (energy doubled, genre halved):
+      +1.0  genre match      (binary)          — was +2.0, halved
       +1.0  mood match       (binary)
-      0–1.5 energy proximity (continuous: 1.5 × (1 - |song.energy - target|))
+      0–3.0 energy proximity (continuous: 3.0 × (1 - |song.energy - target|))
+                                               — was 1.5×, doubled
       +0.5  acoustic bonus   (conditional: likes_acoustic AND acousticness > 0.6)
-    Max possible score: 5.0
+    Max possible score: 5.5
+    Math check: 1.0 + 1.0 + 3.0 + 0.5 = 5.5  (all terms >= 0, energy floor = 0.0)
     """
     score = 0.0
     reasons = []
 
-    # ① Genre match — +2.0
+    # ① Genre match — +1.0 (halved from original +2.0)
     if song["genre"].lower() == user_prefs.get("genre", "").lower():
-        score += 2.0
-        reasons.append("genre match (+2.0)")
+        score += 1.0
+        reasons.append("genre match (+1.0)")
 
     # ② Mood match — +1.0
     if song["mood"].lower() == user_prefs.get("mood", "").lower():
         score += 1.0
         reasons.append("mood match (+1.0)")
 
-    # ③ Energy proximity — 0.0 to +1.5
+    # ③ Energy proximity — 0.0 to +3.0 (doubled from original 1.5×)
     target_energy = user_prefs.get("energy", 0.5)
-    energy_pts = 1.5 * (1.0 - abs(song["energy"] - target_energy))
+    energy_pts = 3.0 * (1.0 - abs(song["energy"] - target_energy))
     score += energy_pts
     reasons.append(f"energy proximity (+{energy_pts:.2f})")
 
@@ -123,6 +125,91 @@ DEFAULT_TEST_PROFILE = {
     "genre": "pop",
     "mood": "happy",
     "energy": 0.8,
+    "likes_acoustic": False
+}
+
+HIGH_ENERGY_POP = {
+    "genre": "pop",
+    "mood": "energetic",
+    "energy": 0.95,
+    "likes_acoustic": False
+}
+
+CHILL_LOFI = {
+    "genre": "lofi",
+    "mood": "chill",
+    "energy": 0.25,
+    "likes_acoustic": True
+}
+
+DEEP_INTENSE_ROCK = {
+    "genre": "rock",
+    "mood": "intense",
+    "energy": 0.9,
+    "likes_acoustic": False
+}
+
+# ── Adversarial / Edge-Case Profiles ────────────────────────────────────────
+#
+# These profiles probe the scoring logic for unexpected or counterintuitive
+# results. Each comment explains exactly what is being stress-tested.
+
+# Edge case: mood contradicts energy level, and "sad" does not exist in the
+# dataset so mood never fires (+0). Energy 0.9 will strongly favour
+# metal/rock songs (e.g. Chainsaw Heart, Storm Runner) even though the user
+# claims a sad mood — exposing that genre+energy can fully override mood when
+# mood has zero matches.
+CONFLICTING_SAD_HIGH_ENERGY = {
+    "genre": "pop",
+    "mood": "sad",        # "sad" absent from songs.csv → mood score always +0
+    "energy": 0.9,        # pulls toward intense/angry songs regardless of mood
+    "likes_acoustic": False
+}
+
+# Edge case: genre that does not exist in the dataset.
+# Genre score is always +0; the winner is decided purely by energy proximity
+# and mood match. Reveals that a user still gets recommendations with an
+# unknown genre — they just won't be genre-relevant at all.
+UNKNOWN_GENRE = {
+    "genre": "bossa nova",  # not present in songs.csv
+    "mood": "relaxed",
+    "energy": 0.5,
+    "likes_acoustic": True
+}
+
+# Edge case: every signal at its minimum boundary.
+# energy=0.0 maximally penalises energetic songs via 1.5*(1-|e-0|).
+# Tests that the formula stays non-negative at the floor (result is 0.0,
+# never negative). Moonlight Sonata Remix (acousticness=0.97) should rank
+# highest: genre+mood+energy proximity+acoustic bonus.
+EXTREME_LOW_ENERGY_ACOUSTIC = {
+    "genre": "classical",
+    "mood": "peaceful",
+    "energy": 0.0,          # minimum possible — hardest penalty for any energetic song
+    "likes_acoustic": True
+}
+
+# Edge case: acoustic bonus enabled but energy preference contradicts acoustic songs.
+# High-acoustic songs (lofi, classical, jazz) cluster at energy 0.22–0.42.
+# Requesting energy=0.95 means those same songs are penalised up to -1.5 by
+# energy proximity while also earning +0.5 acoustic bonus — the two signals
+# fight each other. Demonstrates the bonus can never overcome a large energy gap.
+ACOUSTIC_BUT_HIGH_ENERGY = {
+    "genre": "lofi",
+    "mood": "chill",
+    "energy": 0.95,         # lofi songs are ~0.35–0.42 → energy gap of ~0.55
+    "likes_acoustic": True  # acoustic bonus fires, but energy proximity dominates
+}
+
+# Edge case: perfectly median preferences across every dimension.
+# energy=0.5 sits equidistant from many songs, so no song earns the full +1.5.
+# "rnb" has only two songs; "dreamy" matches only one. Tests whether a
+# middle-of-the-road user produces a stable top-5 or exposes tie-breaking
+# behaviour in the sort.
+MEDIAN_AMBIGUOUS = {
+    "genre": "rnb",
+    "mood": "dreamy",
+    "energy": 0.5,          # equidistant from many songs — may expose sort-stability issues
     "likes_acoustic": False
 }
 

@@ -9,14 +9,14 @@ You will implement the functions in recommender.py:
 - recommend_songs
 """
 
-from src.recommender import load_songs, recommend_songs, DEFAULT_TEST_PROFILE
+from src.recommender import load_songs, recommend_songs, DEFAULT_TEST_PROFILE, ACOUSTIC_BUT_HIGH_ENERGY
 
 
 def main() -> None:
     songs = load_songs("data/songs.csv")
     print(f"Loaded {len(songs)} songs.\n")
 
-    user_prefs = DEFAULT_TEST_PROFILE
+    user_prefs = ACOUSTIC_BUT_HIGH_ENERGY
 
     print("User preferences:")
     for key, value in user_prefs.items():

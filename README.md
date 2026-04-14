@@ -202,4 +202,21 @@ A few sentences about what you learned:
 - How did building this change how you think about real music recommenders
 - Where do you think human judgment still matters, even if the model seems "smart"
 
+First test CLI
 ![alt text](image.png)
+
+
+TESTING Conflicting profiles
+
+CONFLICTING_SAD_HIGH_ENERGY:
+![alt text](image-1.png)
+
+
+UNKNOWN GENRE:
+![alt text](image-2.png)
+
+
+ACOUSTIC_BUT_HIGH_ENERGY:
+![alt text](image-3.png)
+
+
