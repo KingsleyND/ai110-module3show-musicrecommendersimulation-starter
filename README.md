@@ -115,18 +115,13 @@ Combines reflection and model card framing from the Module 3 guidance. :contentR
 
 Give your recommender a name, for example:
 
-> VibeFinder 1.0
+> Moodsongs 1.0
 
 ---
 
 ## 2. Intended Use
 
-- What is this system trying to do
-- Who is it for
-
-Example:
-
-> This model suggests 3 to 5 songs from a small catalog based on a user's preferred genre, mood, and energy level. It is for classroom exploration only, not for real users.
+This model suggests 3 to 5 songs from a small catalog based on a user's preferred genre, mood, and energy level. It is for classroom exploration only, not for real users.
 
 ---
 
@@ -134,11 +129,12 @@ Example:
 
 Describe your scoring logic in plain language.
 
-- What features of each song does it consider
-- What information about the user does it use
-- How does it turn those into a number
+The scoring logic works by breaking a song's compatibility with a user into four weighted components that are added together. 
+For categorical preferences like genre and mood, it assigns a 1 for a match and 0 for no match, these act as gates that heavily reward songs fitting the user's core taste. For numerical features like energy and acousticness, it uses 1 - |difference| to convert distance into similarity, so songs closest to the user's target value score highest. Each component is multiplied by a weight reflecting its importance (genre and mood together account for 65% of the score), then summed into a final score between 0 and 1. The song with the highest score is the best recommendation.
 
-Try to avoid code in this section, treat it like an explanation to a non programmer.
+this model prioritizes 3 main categories: 1-Genre, 2-Mood, 3-Energy 1 being highest which could lead to bias  
+
+
 
 ---
 
@@ -146,10 +142,7 @@ Try to avoid code in this section, treat it like an explanation to a non program
 
 Describe your dataset.
 
-- How many songs are in `data/songs.csv`
-- Did you add or remove any songs
-- What kinds of genres or moods are represented
-- Whose taste does this data mostly reflect
+There are 10 songs in songs.csv spanning 7 genres (pop, lofi, rock, ambient, jazz, synthwave, indie pop) and 5 moods (happy, chill, intense, relaxed, moody, focused), more songs were added, and the data leans toward chill/low-energy listening contexts like studying or late-night vibes.
 
 ---
 
@@ -209,3 +202,4 @@ A few sentences about what you learned:
 - How did building this change how you think about real music recommenders
 - Where do you think human judgment still matters, even if the model seems "smart"
 
+![alt text](image.png)

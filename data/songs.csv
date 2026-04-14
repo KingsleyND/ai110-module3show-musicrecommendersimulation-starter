@@ -9,3 +9,16 @@ id,title,artist,genre,mood,energy,tempo_bpm,valence,danceability,acousticness
 8,Night Drive Loop,Neon Echo,synthwave,moody,0.75,110,0.49,0.73,0.22
 9,Focus Flow,LoRoom,lofi,focused,0.40,80,0.59,0.60,0.78
 10,Rooftop Lights,Indigo Parade,indie pop,happy,0.76,124,0.81,0.82,0.35
+11,Golden Hour,Sunveil,rnb,romantic,0.58,96,0.78,0.72,0.44
+12,Concrete Jungle,Block Theory,hip-hop,energetic,0.85,95,0.62,0.84,0.08
+13,Moonlight Sonata Remix,ClassiCore,classical,peaceful,0.22,66,0.74,0.31,0.97
+14,Island Breeze,Coral Roots,reggae,relaxed,0.54,88,0.83,0.76,0.63
+15,Chainsaw Heart,Iron Veil,metal,angry,0.97,168,0.21,0.55,0.04
+16,Harvest Roads,Dusty Pine,country,nostalgic,0.45,104,0.69,0.58,0.82
+17,Groove Machine,Funkadelphia,funk,energetic,0.80,112,0.88,0.91,0.19
+18,Velvet Dreams,Nova Sable,rnb,dreamy,0.50,84,0.76,0.68,0.55
+19,Stormfront March,The Ironclad,classical,intense,0.65,138,0.38,0.42,0.76
+20,Neon Babylon,Block Theory,hip-hop,moody,0.72,93,0.44,0.80,0.12
+
+
+
